@@ -10,6 +10,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.AxHost;
 
 namespace SerialPadTest {
 
@@ -31,6 +32,7 @@ namespace SerialPadTest {
             X = 6,
             L = 5,
             R = 4,
+            None = -1,
         }
 
         internal readonly string[] buttonNames = { "B", "Y", "SELECT", "START", "UP", "DOWN", "LEFT", "RIGHT", "A", "X", "L", "R", "0", "0", "0", "0" };
@@ -39,13 +41,52 @@ namespace SerialPadTest {
 
         ushort buttons = 0;
 
+        private XInputWrapper.XINPUT_STATE _XInputState = new XInputWrapper.XINPUT_STATE();
+        private Timer connectionCheckTimer, statusCheckTimer;
+
         public Form1() {
             InitializeComponent();
         }
 
         private void Form1_Load(object sender, EventArgs e) {
             LoadSerialPortList();
+            //Shown += ShownHandler;
         }
+
+        //private void ShownHandler(object sender, EventArgs e) {
+        //    connectionCheckTimer = new Timer();
+        //    connectionCheckTimer.Interval = 1000;
+        //    connectionCheckTimer.Tick += ConnectionCheck;
+        //    connectionCheckTimer.Start();
+        //    statusCheckTimer = new Timer();
+        //    statusCheckTimer.Interval = 15;
+        //    statusCheckTimer.Tick += StatusCheck;
+        //    statusCheckTimer.Start();
+        //}
+
+        //private void ConnectionCheck(object sender, EventArgs e) {
+        //    for (uint i = 0; i < 4; i++) {
+        //        if (cvs[i].Status != XInputWrapper.ERROR_SUCCESS) {
+        //            XInputWrapper.XINPUT_STATE state = new XInputWrapper.XINPUT_STATE();
+        //            uint status = XInputWrapper.XInputGetState(i, ref state);
+        //            cvs[i].Status = status;
+        //            if (status == XInputWrapper.ERROR_SUCCESS)
+        //                cvs[i].XInputState = state;
+        //        }
+        //    }
+        //}
+
+        //private void StatusCheck(object sender, EventArgs e) {
+        //    for (uint i = 0; i < 4; i++) {
+        //        if (cvs[i].Status == XInputWrapper.ERROR_SUCCESS) {
+        //            XInputWrapper.XINPUT_STATE state = new XInputWrapper.XINPUT_STATE();
+        //            uint status = XInputWrapper.XInputGetState(i, ref state);
+        //            cvs[i].Status = status;
+        //            if (status == XInputWrapper.ERROR_SUCCESS)
+        //                cvs[i].XInputState = state;
+        //        }
+        //    }
+        //}
 
         private void LoadSerialPortList() {
             comboBoxSelectPort.Items.Clear();
@@ -113,6 +154,9 @@ namespace SerialPadTest {
         }
 
         private void SetButtonToggle(Button button) {
+            if (button == Button.None)
+                return;
+
             int bit = (int)button;
 
             int data = (~buttons >> bit) & 1;
@@ -214,6 +258,66 @@ namespace SerialPadTest {
 
         private void Button_B_Click(object sender, MouseEventArgs e) {
             SetButtonToggle(Button.B);
+        }
+
+        /// <summary>
+        /// キーボードとボタンの対応表
+        /// </summary>
+        Dictionary<Keys, Button> keyCodeToButton = new Dictionary<Keys, Button>() {
+            { Keys.W, Button.Up },
+            { Keys.A, Button.Left },
+            { Keys.S, Button.Down },
+            { Keys.D, Button.Right },
+            { Keys.T, Button.Select },
+            { Keys.Y, Button.Start },
+            { Keys.O, Button.X },
+            { Keys.K, Button.Y },
+            { Keys.L, Button.B },
+            { Keys.Oemplus, Button.A },
+            { Keys.E, Button.L },
+            { Keys.I, Button.R },
+        };
+        Dictionary<Button, bool> buttonStatus = new Dictionary<Button, bool>();
+        /// <summary>
+        /// 押したキーがkeyCodeToButton辞書に登録されていれば、
+        /// 対応したボタンを押したことにする
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_KeyDown(object sender, KeyEventArgs e) {
+            Button button = Button.None;
+            bool stat = false;
+            keyCodeToButton.TryGetValue(e.KeyCode, out button);
+
+            // 辞書に対応したキーが登録されているか？
+            if(button != Button.None) {
+                // buttonStatus辞書に押したキーが登録されているか？
+                if (buttonStatus.TryGetValue(button, out stat)) {
+                    if (stat) {
+                        return;
+                    } else {
+                        buttonStatus[button] = true;
+                    }
+                } else {
+                    // 登録されていなければ新しく追加
+                    buttonStatus.Add(button, true);
+                }
+            }
+
+            SetButtonToggle(button);
+        }
+
+        private void Form1_KeyUp(object sender, KeyEventArgs e) {
+            Button button = Button.None;
+            keyCodeToButton.TryGetValue(e.KeyCode, out button);
+
+            if (button != Button.None) {
+                if (buttonStatus.ContainsKey(button)) {
+                    buttonStatus[button] = false;
+                }
+            }
+
+            SetButtonToggle(button);
         }
     }
 }
