@@ -41,6 +41,7 @@
             this.button_ReloadSeralPort = new System.Windows.Forms.Button();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.XInputConnectionLabel = new System.Windows.Forms.Label();
+            this.XInputButtonLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // comboBoxSelectPort
@@ -227,15 +228,25 @@
             this.XInputConnectionLabel.AutoSize = true;
             this.XInputConnectionLabel.Location = new System.Drawing.Point(579, 15);
             this.XInputConnectionLabel.Name = "XInputConnectionLabel";
-            this.XInputConnectionLabel.Size = new System.Drawing.Size(35, 12);
+            this.XInputConnectionLabel.Size = new System.Drawing.Size(121, 12);
             this.XInputConnectionLabel.TabIndex = 17;
-            this.XInputConnectionLabel.Text = "label1";
+            this.XInputConnectionLabel.Text = "XInputConnectionLabel";
+            // 
+            // XInputButtonLabel
+            // 
+            this.XInputButtonLabel.AutoSize = true;
+            this.XInputButtonLabel.Location = new System.Drawing.Point(579, 38);
+            this.XInputButtonLabel.Name = "XInputButtonLabel";
+            this.XInputButtonLabel.Size = new System.Drawing.Size(98, 12);
+            this.XInputButtonLabel.TabIndex = 18;
+            this.XInputButtonLabel.Text = "XInputButtonLabel";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.XInputButtonLabel);
             this.Controls.Add(this.XInputConnectionLabel);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.button_ReloadSeralPort);
@@ -285,6 +296,7 @@
         private System.Windows.Forms.Button button_ReloadSeralPort;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Label XInputConnectionLabel;
+        private System.Windows.Forms.Label XInputButtonLabel;
     }
 }
 

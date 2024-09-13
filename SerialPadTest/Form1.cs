@@ -27,7 +27,10 @@ namespace SerialPadTest {
 
             Input.form = this;
 
+            Input.serialPort = serialPort;
+
             xInput.XInputConnectionLabel = XInputConnectionLabel;
+            xInput.XInputButtonLabel = XInputButtonLabel;
         }
 
         private void Form1_Load(object sender, EventArgs e) {
@@ -100,10 +103,11 @@ namespace SerialPadTest {
 
         public void DebugWriteLine(string str) {
             if (!string.IsNullOrEmpty(str)) {
-                richTextBox1.AppendText(str);
-                richTextBox1.AppendText(Environment.NewLine);
-                richTextBox1.ScrollToCaret();
-                Debug.WriteLine(str);
+                //richTextBox1.MaxLength = 500;
+                //richTextBox1.AppendText(str);
+                //richTextBox1.AppendText(Environment.NewLine);
+                //richTextBox1.ScrollToCaret();
+                //Debug.WriteLine(str);
             }
         }
 

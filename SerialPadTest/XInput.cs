@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO.Ports;
 using System.Runtime.InteropServices;
@@ -33,21 +34,50 @@ class XInputWrapper {
 
 namespace SerialPadTest {
     public class XInput {
+        /// <summary>
+        /// キーボードとボタンの対応表
+        /// </summary>
+        Dictionary<ushort, Input.Button> keyCodeToButton = new Dictionary<ushort, Input.Button>() {
+            { 1, Input.Button.Up },
+            { 4, Input.Button.Left },
+            { 2, Input.Button.Down },
+            { 8, Input.Button.Right },
+            { 32, Input.Button.Select },
+            { 16, Input.Button.Start },
+            { 32768, Input.Button.X },
+            { 16384, Input.Button.Y },
+            { 4096, Input.Button.B },
+            { 8192, Input.Button.A },
+            { 256, Input.Button.L },
+            { 512, Input.Button.R },
+        };
+
         private Timer connectionCheckTimer, statusCheckTimer;
 
         private XInputWrapper.XINPUT_STATE _XInputState = new XInputWrapper.XINPUT_STATE();
         private uint _Status = 0;
 
         public Label XInputConnectionLabel;
+        public Label XInputButtonLabel;
 
         private XInputWrapper.XINPUT_STATE XInputState {
             get => _XInputState;
             set {
-                _XInputState = value;
-                for (int i = 0; i < 16; i++) {
-                    
-                    Input.SetButtonToggle((Input.Button)((value.Gamepad.wButtons >> i) & 0x1));
+                XInputButtonLabel.Text = value.Gamepad.wButtons.ToString("X4");
 
+                if (_XInputState.Gamepad.wButtons != value.Gamepad.wButtons) {
+                    _XInputState = value;
+
+                    for (int i = 0; i < 16; i++) {
+                        ushort btn = (ushort)(1 << i);
+                        bool isPush = (value.Gamepad.wButtons & (1 << i)) > 0;
+                        if (keyCodeToButton.TryGetValue(btn, out Input.Button button)) {
+                            if(isPush)
+                                Input.form.DebugWriteLine(Enum.GetName(typeof(Input.Button), button));
+
+                            Input.SetButton(button, isPush);
+                        }
+                    }
                 }
             }
         }
@@ -73,11 +103,9 @@ namespace SerialPadTest {
                 uint status = XInputWrapper.XInputGetState(0, ref state);
                 _Status = status;
                 if (status == XInputWrapper.ERROR_SUCCESS) {
-                    _XInputState = state;
+                    XInputState = state;
                     XInputConnectionLabel.Text = "Connected!";
                 }
-            } else {
-                XInputConnectionLabel.Text = "Disconnected.";
             }
         }
 
@@ -87,7 +115,7 @@ namespace SerialPadTest {
                 uint status = XInputWrapper.XInputGetState(0, ref state);
                 _Status = status;
                 if (status == XInputWrapper.ERROR_SUCCESS)
-                    _XInputState = state;
+                    XInputState = state;
             }
         }
     }

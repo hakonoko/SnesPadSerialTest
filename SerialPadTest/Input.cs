@@ -9,7 +9,7 @@ namespace SerialPadTest {
     public static class Input {
         public static Form1 form;
 
-        static SerialPort serialPort = new SerialPort();
+        public static SerialPort serialPort;
 
         // Clock Cycle: 1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16
         // Button     : B  Y  Se St U  D  L  R  A  X  L  R  0  0  0  0 
@@ -50,16 +50,21 @@ namespace SerialPadTest {
             SerialWriteButtons(buttons);
         }
 
-        //private void SetButton(int bit, bool isPush) {
-        //    if (isPush) {
-        //        buttons |= (ushort)(1 << bit);
-        //    } else {
-        //        ushort mask = (ushort)~(0x0000 | (1 << bit));
-        //        buttons &= mask;
-        //    }
+        public static void SetButton(Button button, bool isPush) {
+            if (button == Button.None)
+                return;
 
-        //    SerialWriteButtons(buttons);
-        //}
+            int bit = (int)button;
+
+            if (isPush) {
+                buttons |= (ushort)(1 << bit);
+            } else {
+                ushort mask = (ushort)~(0x0000 | (1 << bit));
+                buttons &= mask;
+            }
+
+            SerialWriteButtons(buttons);
+        }
 
         public static void SerialWriteButtons(ushort buttons) {
             byte high = (byte)((buttons & 0xFF00) >> 8);
