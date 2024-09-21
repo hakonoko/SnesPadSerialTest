@@ -28,7 +28,7 @@ namespace SerialPadTest {
             X = 6,
             L = 5,
             R = 4,
-            None = -1,
+            None = 0,
         }
 
         public static readonly string[] buttonNames = { "B", "Y", "SELECT", "START", "UP", "DOWN", "LEFT", "RIGHT", "A", "X", "L", "R", "0", "0", "0", "0" };

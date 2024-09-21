@@ -1,36 +1,51 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO.Ports;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Policy;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.AxHost;
-using static XInputWrapper;
+using static SerialPadTest.WiimoteInput;
 
 namespace SerialPadTest {
 
     public partial class Form1 : Form {
         SerialPort serialPort = new SerialPort();
 
-        private KeyboardInput kInput = new KeyboardInput();
-        private XInput xInput = new XInput();
+        private KeyboardInput kInput;
+        private XInput xInput;
+        private WiimoteInput wInput;
+
+        static public Form1 Form;
 
         public Form1() {
             InitializeComponent();
+
+            Form = this;
 
             Input.form = this;
 
             Input.serialPort = serialPort;
 
+            SerialPortConnectButtonEnabled(true);
+
+            InitInputs();
+        }
+
+        private void InitInputs() {
+            kInput = new KeyboardInput();
+            xInput = new XInput();
+
             xInput.XInputConnectionLabel = XInputConnectionLabel;
             xInput.XInputButtonLabel = XInputButtonLabel;
+
+            WiimoteLabels wLabels = new WiimoteLabels() {
+                Weight = lblWeight,
+                TopLeft = lblTL,
+                TopRight = lblTR,
+                BottomLeft = lblBL,
+                BottomRight = lblBR,
+                BWBRect = BWBRect,
+                BWBPosition = BWBPosition,
+            };
+            wInput = new WiimoteInput(wLabels);
         }
 
         private void Form1_Load(object sender, EventArgs e) {
@@ -66,7 +81,10 @@ namespace SerialPadTest {
                 serialPort.PortName = comboBoxSelectPort.GetItemText(selectedObject);
                 serialPort.WriteBufferSize = 2;
                 serialPort.DataReceived += SerialPort_DataReceived;
+                serialPort.Disposed += (obj, eventArgs) => SerialPortConnectButtonEnabled(true);
                 serialPort.Open();
+
+                SerialPortConnectButtonEnabled(false);
 
                 Input.ResetButton();
 
@@ -75,6 +93,11 @@ namespace SerialPadTest {
             } catch {
                 DebugWriteLine($"Serial \"{serialPort.PortName}\" connect failed.");
             }
+        }
+
+        private void SerialPortConnectButtonEnabled(bool enabled) {
+            Button_Connect.Enabled = enabled;
+            button_Disconnect.Enabled = !enabled;
         }
 
         private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e) {
@@ -171,6 +194,46 @@ namespace SerialPadTest {
 
         private void Form1_KeyUp(object sender, KeyEventArgs e) {
             kInput.KeyUp(sender, e);
+        }
+
+        /// <summary>
+        /// フォームを閉じるときに行う処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
+            wInput.Disconnect();
+        }
+
+        private void WiimoteConnect_Click(object sender, EventArgs e) {
+            wInput.Connect();
+        }
+
+        private void ResetZeroPoint_Click(object sender, EventArgs e) {
+            wInput.ResetZeroPoint();
+        }
+
+        public void SetLabel(Label label, string text) {
+            try {
+
+                if (this.InvokeRequired) {
+                    this.Invoke(new Action(() => { label.Text = text; }));
+                } else {
+                    label.Text = text;
+                }
+            } catch (Exception ex) {
+            }
+        }
+
+        public void SetPosition(PictureBox pictureBox, System.Drawing.Point point) {
+            try {
+                if (this.InvokeRequired) {
+                    this.Invoke(new Action(() => { pictureBox.Location = point; }));
+                } else {
+                    pictureBox.Location = point;
+                }
+            } catch (Exception ex) {
+            }
         }
     }
 }

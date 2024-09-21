@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.IO.Ports;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
-using static XInputWrapper;
+
+/// <summary>
+/// Xinput関連、この人のやつほぼ丸パクリだよ!ありがとう！
+/// https://qiita.com/mikecat_mixc/items/7ea7bab63c93f1b2b04d
+/// </summary>
 
 class XInputWrapper {
     public const uint ERROR_SUCCESS = 0;
