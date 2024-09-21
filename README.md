@@ -1,4 +1,4 @@
-# SerialPadTest
+# SnesPadSerialTest
 
 こっちとセット ESP32にはこれ入れて使う
 <br>
@@ -9,8 +9,7 @@ Xinputパクリ元（ありがとう！）
 https://qiita.com/mikecat_mixc/items/7ea7bab63c93f1b2b04d
 <br>
 <br>
-Used Libraries
-<br>
+# Used Libraries
 ・WiimoteLib
 <br>
 　https://github.com/BrianPeek/WiimoteLib
