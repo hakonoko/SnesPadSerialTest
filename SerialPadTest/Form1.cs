@@ -17,11 +17,10 @@ namespace SerialPadTest {
 
         public Form1() {
             InitializeComponent();
+            richTextBox1.MaxLength = 500;
 
             Form = this;
-
             Input.form = this;
-
             Input.serialPort = serialPort;
 
             SerialPortConnectButtonEnabled(true);
@@ -125,13 +124,21 @@ namespace SerialPadTest {
         }
 
         public void DebugWriteLine(string str) {
-            if (!string.IsNullOrEmpty(str)) {
-                //richTextBox1.MaxLength = 500;
-                //richTextBox1.AppendText(str);
-                //richTextBox1.AppendText(Environment.NewLine);
-                //richTextBox1.ScrollToCaret();
-                //Debug.WriteLine(str);
-            }
+            //if (!string.IsNullOrEmpty(str)) {
+            //    if (InvokeRequired) {
+            //        this.Invoke(new Action(() => {
+            //            richTextBox1.AppendText(str);
+            //            richTextBox1.AppendText(Environment.NewLine);
+            //            richTextBox1.ScrollToCaret();
+            //        }));
+                    
+            //    } else {
+            //        richTextBox1.AppendText(str);
+            //        richTextBox1.AppendText(Environment.NewLine);
+            //        richTextBox1.ScrollToCaret();
+            //    }
+                System.Diagnostics.Debug.WriteLine(str);
+            //}
         }
 
         private void Button_UP_MouseDown(object sender, MouseEventArgs e) {

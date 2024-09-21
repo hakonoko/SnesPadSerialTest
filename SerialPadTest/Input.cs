@@ -34,6 +34,7 @@ namespace SerialPadTest {
         public static readonly string[] buttonNames = { "B", "Y", "SELECT", "START", "UP", "DOWN", "LEFT", "RIGHT", "A", "X", "L", "R", "0", "0", "0", "0" };
 
         static ushort buttons = 0;
+        static ushort prevbuttons = 0;
 
         public static void SetButtonToggle(Button button) {
             if (button == Button.None)
@@ -67,26 +68,30 @@ namespace SerialPadTest {
         }
 
         public static void SerialWriteButtons(ushort buttons) {
-            byte high = (byte)((buttons & 0xFF00) >> 8);
-            byte low = (byte)(buttons & 0x00FF);
+            if (prevbuttons != buttons) {
+                prevbuttons = buttons;
 
-            if (serialPort.IsOpen)
-                serialPort.Write(new byte[] { high, low }, 0, 2);
+                byte high = (byte)((buttons & 0xFF00) >> 8);
+                byte low = (byte)(buttons & 0x00FF);
 
-            form.DebugWriteLine("Data: " + (high).ToString("X2") + (low).ToString("X2"));
-            if (buttons > 0) {
-                StringBuilder sb = new StringBuilder();
-                sb.Append("Button: ");
-                for (int i = 15; i >= 0; i--) {
-                    if (((buttons >> i) & 0x0001) == 1) {
-                        sb.Append(buttonNames[15 - i] + ", ");
+                if (serialPort.IsOpen)
+                    serialPort.Write(new byte[] { high, low }, 0, 2);
+
+                form.DebugWriteLine("Data: " + (high).ToString("X2") + (low).ToString("X2"));
+                if (buttons > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("Button: ");
+                    for (int i = 15; i >= 0; i--) {
+                        if (((buttons >> i) & 0x0001) == 1) {
+                            sb.Append(buttonNames[15 - i] + ", ");
+                        }
                     }
-                }
-                sb.Remove(sb.Length - 2, 1);
+                    sb.Remove(sb.Length - 2, 1);
 
-                form.DebugWriteLine(sb.ToString());
-            } else {
-                form.DebugWriteLine("Button: None.");
+                    form.DebugWriteLine(sb.ToString());
+                } else {
+                    form.DebugWriteLine("Button: None.");
+                }
             }
         }
 
