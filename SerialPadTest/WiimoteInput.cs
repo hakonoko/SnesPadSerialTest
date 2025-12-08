@@ -186,7 +186,7 @@ namespace SerialPadTest {
             weightList.Insert(0, weight);
 
             if(weightList.Count > weightListLength) {
-                weightList.RemoveRange(weightListLength, weightList.Count - weightListLength);
+                weightList.RemoveRange(weightListLength, weightList.Count - weightListLength - 1);
             }
 
             //Form1.Form.DebugWriteLine(weightList.Count.ToString());
